@@ -1,6 +1,7 @@
-id,nombre,disciplina,region
-1,Ana Torres,Atletismo,Lima
-2,Luis Ramos,Natacion,Arequipa
-3,Mariela Soto,Voleibol,Cusco
-3,Mariela Soto,Voleibol,Cusco
-4,,Futbol,Piura
+id,nombre,disciplina,edad
+1,Ana,Voley,20
+2,Luis,Atletismo,22
+3,María,Natación,19
+3,María,Natación,19
+4,,Voley,20
+5,Carlos,Fútbol,8

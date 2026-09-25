@@ -1,32 +1,23 @@
-# Entrega S05 - v1.0.0
+# Borrador de release — v2.0.0
 
-## Autor
+**Proyecto:** IPD — Inteligencia Deportiva  
+**Estudiante:** Nayeli Rocío Herrera Albino  
+**Estado:** PREPARACIÓN; no publicar sin integración y comprobación en Valle Grande.
 
-- **Nayeli Rocio Herrera Albino**
-- **Número de orden:** 07
-- **Proyecto:** IPD — Inteligencia Deportiva
-- **GitHub:** @NayeliRocio
+## Cambio principal
 
-## Avance realizado
+Migración de la estructura inicial Python/PySpark a la arquitectura Java del curso.
 
-- Entorno base del proyecto configurado.
-- Arquitectura inicial organizada por responsabilidades.
-- Ingesta inicial de archivos CSV con Apache Spark.
-- Pipeline de preparación con limpieza y deduplicación.
-- Control básico de calidad de datos.
-- Dataset de prueba y prueba unitaria.
-- Documentación técnica inicial.
+## Componentes
 
-## Comprobaciones
+- Multi-módulo Maven: contracts, spark-worker, backend-api y frontend.
+- Worker Apache Spark en Java con datos deportivos sintéticos de prueba.
+- Contratos Java compartidos.
+- API HTTP y frontend de demostración.
+- Pruebas unitarias de calidad y documentación.
 
-- PySpark definido en versión **4.1.2**.
-- Pruebas automatizadas preparadas con pytest.
-- Código sin nombres del estudiante en clases, funciones, paquetes o variables.
+## Validación pendiente
 
-## Pendiente
-
-- Incorporar fuentes reales priorizadas del IPD.
-- Implementar arquitectura de datos RAW/Bronze, Silver y Gold.
-- Añadir reglas de calidad específicas del negocio.
-- Construir indicadores deportivos y visualizaciones.
-- Integrar almacenamiento cloud.
+- Compilar con `mvn clean verify` en un equipo con JDK/Maven y dependencias.
+- Confirmar acceso al repositorio institucional.
+- Integrar allí la rama de desarrollo y publicar tag/release `v2.0.0`.

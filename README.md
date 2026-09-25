@@ -1,129 +1,62 @@
-# Proyecto Big Data con Spark
+# IPD — Inteligencia Deportiva | Java + Apache Spark
 
-- **Estudiante:** Nayeli Rocio Herrera Albino
-- **Número de orden:** 07
-- **Proyecto asignado:** IPD
-- **Usuario GitHub:** @NayeliRocio
-- **Versión actual:** 1.0.0
+**Estudiante:** Nayeli Rocío Herrera Albino · **N.º:** 07 · **Curso:** Big Data  
+**Versión de trabajo:** 2.0.0 (preparación S07; no publicada todavía como release)
 
-## Inteligencia Deportiva – IPD
+## Corrección del proyecto
 
-Proyecto académico orientado a la integración y preparación de información deportiva mediante Apache Spark. Esta primera versión establece el entorno, la arquitectura inicial y componentes base para incorporar fuentes deportivas, aplicar controles de calidad y preparar los datos para etapas posteriores de análisis.
+Esta rama reemplaza la arquitectura anterior en **Python/PySpark** por el proyecto
+en **Java, Maven y Apache Spark para Java** solicitado por el docente.
+La versión 1.0.0 anterior se conserva únicamente en el historial de Git.
 
-## Estructura
+## Arquitectura
 
-```text
-.
-├── data/
-│   └── sample/
-│       └── deportistas.csv
-├── docs/
-│   ├── architecture.md
-│   └── evidencias/
-│       └── README.md
-├── src/
-│   ├── application/
-│   │   └── spark_pipeline.py
-│   ├── domain/
-│   │   └── quality_gate.py
-│   ├── infrastructure/
-│   │   └── csv_input_adapter.py
-│   └── main.py
-├── tests/
-│   └── test_quality_gate.py
-├── CHANGELOG.md
-├── RELEASE_NOTES.md
-├── requirements.txt
-└── README.md
-```
+Proyecto multi-módulo Maven basado en la distribución vista en el repositorio de
+referencia del docente, adaptado al caso académico IPD:
 
-## Arquitectura inicial
+- `contracts`: modelos compartidos `Deportista` y `ResumenDisciplina`.
+- `spark-worker`: lectura de CSV, limpieza, validación, deduplicación y resumen por disciplina.
+- `backend-api`: servicio Spring Boot WebFlux con endpoints de demostración.
+- `frontend`: interfaz HTML servida por Spring Boot.
 
-- **Domain:** reglas de calidad del dato.
-- **Application:** procesamiento y preparación mediante Spark.
-- **Infrastructure:** adaptadores de entrada de datos.
-- **Data:** datos controlados para pruebas.
+El CSV de muestra es **sintético**, no una fuente oficial del IPD.
 
-Flujo inicial:
+## Requisitos
 
-```text
-CSV → CsvInputAdapter → SparkPipeline → datos preparados
-                     ↘ QualityGate
-```
-
-## Entorno
-
-- Python 3.11 o superior recomendado.
-- Apache Spark / PySpark 4.1.2.
-- pytest para pruebas automatizadas.
-
-## Instalación
+JDK 17 y Maven 3.9+ disponibles en PATH. Las dependencias se descargan desde Maven Central
+en la primera compilación; la versión Spark está alineada con el ejemplo de clase (4.1.2).
 
 ```bash
-python -m venv .venv
+mvn clean verify
 ```
 
-En Windows:
+Para ejecutar la API y la interfaz (desde la raíz tras `mvn install`):
 
 ```bash
-.venv\Scripts\activate
-pip install -r requirements.txt
+mvn -pl backend-api spring-boot:run
+mvn -pl frontend spring-boot:run
 ```
 
-## Ejecución
+Abrir `http://localhost:8081`; API de estado: `http://localhost:8080/api/status`.
 
-Desde la raíz del proyecto:
+Para ejecutar el worker Spark local (desde la raíz, después de `mvn install`):
 
 ```bash
-python src/main.py
+mvn -pl spark-worker exec:java -Dexec.mainClass=pe.edu.vallegrande.ipd.worker.SparkWorkerApplication
 ```
 
-## Pruebas
+El entorno local de Spark puede requerir opciones adicionales de Java y red según el sistema.
 
-```bash
-pytest -q
-```
+## Alcance real de esta versión
 
-La prueba incluida comprueba que `QualityGate` detecte registros deportivos con campos obligatorios incompletos.
+Estructura Java, Maven multi-módulo, contrato compartido, transformación simple con Spark,
+API y frontend de muestra, documentación y test unitario de calidad. **No se declara**
+que los componentes estén desplegados ni integrados con datos reales del IPD.
 
-## Git Flow aplicado
+## Release
 
-```text
-main
-  └── develop
-       └── feature/s05-entorno-arquitectura
-       └── release/1.0.0
-```
+Antes de crear la tag y release `v2.0.0`, integrar esta arquitectura al repositorio
+**institucional** y ejecutar su compilación/pruebas. El historial en Python no debe
+publicarse como la nueva arquitectura Java.
 
-Flujo de la entrega:
-
-1. `develop` creado desde `main`.
-2. `feature/s05-entorno-arquitectura` creado desde `develop`.
-3. Avance desarrollado mediante commits en la rama feature.
-4. Pull Request de feature hacia develop.
-5. `release/1.0.0` creado desde develop.
-6. Actualización de README, evidencias y CHANGELOG.
-7. Pull Request de release hacia main.
-8. Publicación de `v1.0.0` sobre main.
-
-## Alcance v1.0.0
-
-Incluye:
-
-- estructura inicial del proyecto;
-- lectura de archivos CSV con Spark;
-- limpieza y deduplicación básica;
-- validación inicial de calidad;
-- datos de muestra;
-- prueba unitaria;
-- documentación de arquitectura;
-- documentación de la entrega.
-
-## Pendiente para siguientes versiones
-
-- integración de fuentes oficiales priorizadas del IPD;
-- persistencia por capas RAW/Bronze, Silver y Gold;
-- reglas de calidad adicionales;
-- indicadores deportivos;
-- integración con almacenamiento cloud;
-- automatización completa del pipeline.
+Más detalles: `docs/architecture.md` y `RELEASE_NOTES.md`.
