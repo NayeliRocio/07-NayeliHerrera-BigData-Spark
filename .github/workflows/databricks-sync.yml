@@ -1,0 +1,64 @@
+name: S5 - Validar y sincronizar Git Folder
+
+on:
+  push:
+    branches: [main, develop, feature/s5-evaluacion-integraciones]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: databricks-git-folder-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Pruebas de integración sin acceso cloud
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar dependencias de prueba
+        run: python -m pip install pytest==8.4.2
+      - name: Ejecutar pruebas
+        run: python -m pytest -q
+      - name: Informar estado de la conexión
+        if: vars.DATABRICKS_SYNC_ENABLED != 'true'
+        run: |
+          echo 'La sincronización cloud está pendiente de configuración y ejecución. Las pruebas locales no acreditan conexión con Databricks.' >> "$GITHUB_STEP_SUMMARY"
+
+  sync:
+    name: Sincronizar y verificar commit en Databricks
+    needs: validate
+    if: >-
+      github.event_name != 'pull_request' &&
+      vars.DATABRICKS_SYNC_ENABLED == 'true' &&
+      github.ref_name == vars.DATABRICKS_SYNC_BRANCH
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
+      DATABRICKS_REPO_ID: ${{ vars.DATABRICKS_REPO_ID }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      DATABRICKS_BRANCH: ${{ github.ref_name }}
+      EXPECTED_COMMIT: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Sincronizar Git Folder existente
+        run: python scripts/sync_databricks_git_folder.py
+      - name: Guardar evidencia verificada
+        uses: actions/upload-artifact@v4
+        with:
+          name: databricks-sync-${{ github.sha }}
+          path: artifacts/databricks-sync.json
+          if-no-files-found: error
+          retention-days: 7
