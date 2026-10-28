@@ -127,3 +127,12 @@ Incluye:
 - indicadores deportivos;
 - integración con almacenamiento cloud;
 - automatización completa del pipeline.
+
+## Evaluación intermedia S5
+
+La rama `feature/s5-evaluacion-integraciones` incorpora un workflow de GitHub Actions para sincronizar un Git Folder existente y verificar su rama y commit, además de un notebook independiente para comprobar lectura CSV desde S3 con Spark.
+
+- [Configuración, ejecución y evidencias de Databricks/S3](docs/S5_INTEGRACION_DATABRICKS.md).
+- [Estado de los 18 criterios y admisibilidad](docs/S5_ESTADO_CRITERIOS.md).
+
+La sincronización cloud permanece deshabilitada hasta configurar el destino y las credenciales autorizadas. Las pruebas locales no acreditan una conexión activa. El pipeline unificado compartido de Colab no se modifica.
