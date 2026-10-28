@@ -9,7 +9,7 @@ Revisión de los materiales proporcionados el 27 de octubre de 2026, hora de Lim
 | Plan de acción hasta sprint 3 | No se adjuntó el plan para revisar. |
 | Actas de reuniones | No se adjuntaron actas. No deben inventarse reuniones ni acuerdos. |
 | Carpetas organizadas por sprint | Pendiente de revisar la organización compartida del equipo. |
-| GitHub actualizado | Hay ramas de trabajo. Esta entrega agrega automatización y documentación en una nueva rama; la publicación e integración deben comprobarse en GitHub. |
+| GitHub actualizado | Cambios publicados en `feature/s5-evaluacion-integraciones`, PR #4 hacia `develop`. Actions aprobó la validación; el job de sincronización cloud quedó omitido por configuración pendiente. El PR está en borrador y no se ha integrado. |
 
 ## Criterios por curso
 
@@ -19,7 +19,7 @@ Revisión de los materiales proporcionados el 27 de octubre de 2026, hora de Lim
 | Administración | Stakeholders | 1 | No se aportó una matriz o descripción para verificar. |
 | Administración | Planificación fundamentada | 1 | Falta revisar plan de acción, responsables y fechas reales. |
 | Administración | Historias completadas | 1 | Existen notas de validación parcial de US2 en este repositorio. Faltan las historias del equipo, criterios de aceptación y evidencia vinculada. |
-| IA | GitHub → Git Folder mediante pipeline | 2 | Workflow y script preparados con validación del SHA. Falta configurar acceso, ejecutarlo y comprobar el Git Folder real. |
+| IA | GitHub → Git Folder mediante pipeline | 2 | Workflow y script publicados con validación del SHA. El Git Folder real fue visible en `feature/s11-s3-genie`, pero Databricks bloqueó el control automatizado de su consola. Falta configurar y ejecutar la sincronización mediante una conexión autorizada. |
 | IA | Databricks → S3, lectura CSV/Excel | 2 | Notebook independiente de lectura CSV preparado. Falta confirmar bucket/objeto, permisos y ejecución en Databricks. |
 | FCS | Gitflow y Conventional Commits en GitLab | 1 | Los repositorios GitLab requieren acceso. No se verificaron sus ramas, commits, tags ni releases. El historial de GitHub no sustituye esta evidencia. |
 | FCS | 5 atributos ISO 25010:2011 | 1 | Pendiente documento vinculado al producto y evidencia verificable del job Spark. Las métricas de calidad de datos deben distinguirse de los atributos de calidad del software. |
@@ -43,3 +43,11 @@ Revisión de los materiales proporcionados el 27 de octubre de 2026, hora de Lim
 5. Reunir Figma, plan, actas e historias de usuario del equipo para completar las evidencias documentales.
 
 El pipeline unificado compartido queda reservado a Freddy. Los totales de sus salidas son registros de distintos tipos; no deben presentarse como una cantidad de deportistas únicos.
+
+## Validación de esta entrega
+
+- 11 pruebas Python aprobadas localmente.
+- GitHub Actions, ejecución `40631710870`: validación correcta; sincronización cloud omitida. Esta ejecución no acredita conexión a Databricks.
+- Sesión Databricks verificada y Git Folder identificado; ninguna ejecución del job ni lectura S3 verificada.
+- La consola AWS resultó inaccesible desde el navegador disponible. No se creó ni modificó un bucket.
+- GitLab rechazó el inicio de sesión con `Invalid login or password`; no se crearon tags, releases ni cambios del job.

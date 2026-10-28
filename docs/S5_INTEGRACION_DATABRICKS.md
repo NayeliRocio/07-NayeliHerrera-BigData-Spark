@@ -12,7 +12,7 @@ Configurar en GitHub → Settings → Secrets and variables → Actions:
 
 | Tipo | Nombre | Valor |
 |---|---|---|
-| Variable | `DATABRICKS_HOST` | Origen HTTPS del workspace; el observado en la captura es `https://dbc-6d9a3ebe-2368.cloud.databricks.com`. |
+| Variable | `DATABRICKS_HOST` | Origen HTTPS del workspace autorizado. Configurarlo de forma privada en GitHub; no publicar identificadores del workspace en la documentación. |
 | Variable | `DATABRICKS_REPO_ID` | ID numérico del Git Folder exacto de este repositorio, obtenido de Databricks. No es el ID del workspace. |
 | Variable | `DATABRICKS_SYNC_BRANCH` | Rama que debe seguir ese Git Folder; para probar esta entrega: `feature/s5-evaluacion-integraciones`. |
 | Variable | `DATABRICKS_SYNC_ENABLED` | `true`, después de comprobar el destino y los accesos. |
@@ -21,6 +21,12 @@ Configurar en GitHub → Settings → Secrets and variables → Actions:
 Se necesita una credencial Git configurada dentro de Databricks y permiso para gestionar el Git Folder. La credencial de Databricks y la credencial de Git son distintas. Si PAT no está disponible, se debe adaptar la autenticación a OAuth admitido por el workspace; no se debe habilitar este flujo con credenciales improvisadas. Databricks recomienda OAuth para nuevas integraciones.
 
 El script consulta primero el Git Folder por ID, comprueba que su URL corresponde a este repositorio y solicita actualizar la rama. Después vuelve a consultar y exige igualdad tanto de rama como de SHA respecto al evento de GitHub. Solo entonces produce el artefacto `databricks-sync-<sha>` con `status: verified`.
+
+### Comprobación del workspace
+
+Se inició sesión en el workspace indicado y se confirmó que el proyecto tiene un **Git folder**, en la rama `feature/s11-s3-genie`. El identificador exacto debe verificarse con la API Repos y configurarse de forma privada como `DATABRICKS_REPO_ID`.
+
+La consola mostró el aviso **Automated browser control detected** y rechazó el control automatizado, indicando usar Genie One MCP. No se cambió la rama ni se ejecutó código dentro del workspace. La conexión MCP autorizada es la vía pendiente para continuar esta parte.
 
 La API de actualización puede rechazar cambios locales pendientes dentro del Git Folder. Deben revisarse antes de activar la automatización; este flujo no borra ni fuerza esos cambios. La versión actual no gestiona Git Folders habilitados exclusivamente mediante Git CLI si no admiten la API Repos.
 
