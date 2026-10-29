@@ -44,15 +44,17 @@ El workflow **IPD - GitHub sync y S3 a Silver** ejecuta dos tareas en orden:
 1. `notebooks/00_sync_git_folder.py` sincroniza la rama `main` de GitHub con el Git Folder del workspace. Utiliza la identidad de ejecución, sin tokens en el código, y falla si existen conflictos locales.
 2. `notebooks/01_s3_to_silver.py` lee `s3://ipd-nayeli-s3/raw/deportistas.csv`, valida campos obligatorios, elimina duplicados por `id` y escribe Delta en `s3://ipd-nayeli-s3/silver/deportistas`. Registra `ipd_catalog.silver.deportistas` en Unity Catalog y comprueba el conteo persistido.
 
-La programación es diaria a las **07:00, America/Lima**. También se puede ejecutar manualmente desde Jobs & Pipelines. Los cambios de GitHub se incorporan en la próxima ejecución; no se utiliza un webhook por cada push.
+GitHub Actions sincroniza y verifica el Git Folder con cada **push a `main`**. El procesamiento S3 está programado diariamente a las **07:00, America/Lima**, y también se puede ejecutar manualmente desde Jobs & Pipelines. La tarea inicial del job vuelve a sincronizar como respaldo antes de procesar los datos.
 
 - [Workflow en Databricks](https://dbc-6d9a3ebe-2368.cloud.databricks.com/jobs/1010035654278929?o=7474649658925615)
 - Definición reproducible: `databricks/ipd_workflow.json`.
 - External Location: `ipd-nayeli-s3-n`, con la credencial IAM existente del workspace.
-- No se necesitan claves AWS en notebooks ni secretos de Databricks en GitHub.
+- No se incluyen claves AWS ni tokens en el código. GitHub Actions utiliza el secreto cifrado `DATABRICKS_TOKEN` y las variables `DATABRICKS_HOST` y `DATABRICKS_REPO_ID`.
 - Se verificó la fuente CSV. La lectura de Excel no forma parte de esta implementación.
 
 Los datos de muestra contienen 5 filas: 1 inválida, 1 duplicada y 3 deportistas válidos únicos. Son datos académicos, no indicadores oficiales del IPD.
+
+El pipeline `.github/workflows/databricks-sync.yml` valida el proyecto antes de sincronizar y guarda un artefacto que acredita el commit aplicado. En los pull requests ejecuta únicamente las pruebas. [Configuración y comparación con la referencia](docs/GITHUB_ACTIONS_DATABRICKS.md).
 
 Para crear el workflow en este mismo workspace mediante una sesión autenticada de la CLI:
 
