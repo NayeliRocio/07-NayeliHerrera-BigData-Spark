@@ -1,8 +1,8 @@
 {
-  "name": "IPD - GitHub sync y S3 a Silver",
-  "description": "Sincroniza main con el Git Folder y procesa deportistas.csv desde S3 mediante Unity Catalog.",
+  "name": "IPD - GitHub sync y S3 a Silver-Gold",
+  "description": "Sincroniza main, procesa el CSV desde S3, genera un archivo Gold en el bucket y lo consume para crear una tabla de indicadores.",
   "max_concurrent_runs": 1,
-  "timeout_seconds": 1800,
+  "timeout_seconds": 2400,
   "schedule": {
     "quartz_cron_expression": "0 0 7 * * ?",
     "timezone_id": "America/Lima",
@@ -37,6 +37,17 @@
         }
       },
       "timeout_seconds": 1200,
+      "max_retries": 1,
+      "min_retry_interval_millis": 30000
+    },
+    {
+      "task_key": "silver_to_gold",
+      "depends_on": [{"task_key": "s3_to_silver"}],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/nayeli.herrera@vallegrande.edu.pe/07-NayeliHerrera-BigData-Spark/notebooks/02_silver_to_gold",
+        "source": "WORKSPACE"
+      },
+      "timeout_seconds": 600,
       "max_retries": 1,
       "min_retry_interval_millis": 30000
     }

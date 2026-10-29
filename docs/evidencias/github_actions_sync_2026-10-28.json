@@ -1,0 +1,21 @@
+{
+  "id": 40803468571,
+  "event": "push",
+  "head_branch": "main",
+  "head_sha": "af193c19476aeca6ef595a631992c44809c2a484",
+  "status": "completed",
+  "conclusion": "success",
+  "html_url": "https://github.com/NayeliRocio/07-NayeliHerrera-BigData-Spark/actions/runs/40803468571",
+  "jobs": [
+    {
+      "name": "Validar proyecto",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Sincronizar y verificar Git Folder",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ]
+}

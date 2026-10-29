@@ -19,6 +19,7 @@ El notebook de la referencia lee CSV con Spark mediante Unity Catalog y registra
 | Evidencia | Artefacto `databricks-sync-<SHA>` en la ejecución de Actions |
 | Procesamiento S3 | Workflow Databricks diario a las 07:00, America/Lima |
 | Tabla de salida | Delta externa en `ipd_catalog.silver.deportistas` |
+| Archivo Gold consumido desde S3 | `gold/deportistas_por_disciplina_region.csv` → `ipd_catalog.gold.deportistas_por_disciplina_region` |
 
 Los pasos de Actions están fijados a commits de sus repositorios oficiales. La sincronización falla si faltan credenciales, si el Git Folder pertenece a otro repositorio o si el commit final no coincide con el push. No descarta cambios locales por la fuerza.
 
