@@ -11,7 +11,7 @@ Se reutiliza `NayeliRocio/07-NayeliHerrera-BigData-Spark`, proyecto IPD. El CSV 
 La captura del bucket muestra la carpeta `raw/`. Sube allí el archivo `data/sample/deportistas.csv` con el nombre `deportistas.csv`. El notebook crea el prefijo Silver al escribir Delta.
 
 ## Ejecución en Databricks
-1. Abre el Git Folder sincronizado con este repositorio y cambia a la rama `feature/s11-s3-genie` o sincroniza la rama con tu Git Folder.
+1. El workflow sincroniza la rama `main` de este repositorio con el Git Folder antes de procesar datos. También puedes ejecutar el job manualmente.
 2. En Unity Catalog, necesitas una External Location para el bucket con permisos de lectura sobre `raw/` y escritura sobre `silver/`. El bucket ARN por sí solo no concede acceso. No guardes claves AWS en GitHub.
 3. Ejecuta `sql/01_catalog_schema.sql`. Si no puedes crear `ipd_catalog`, usa el catálogo que te asignó el docente y ajusta el nombre en los archivos.
 4. Ejecuta `notebooks/01_s3_to_silver.py`. Comprueba el conteo y las filas que muestra.

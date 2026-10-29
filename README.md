@@ -37,7 +37,32 @@ Proyecto académico orientado a la integración y preparación de información d
 └── README.md
 ```
 
-## Arquitectura inicial
+## Integración Databricks y Amazon S3
+
+El workflow **IPD - GitHub sync y S3 a Silver** ejecuta dos tareas en orden:
+
+1. `notebooks/00_sync_git_folder.py` sincroniza la rama `main` de GitHub con el Git Folder del workspace. Utiliza la identidad de ejecución, sin tokens en el código, y falla si existen conflictos locales.
+2. `notebooks/01_s3_to_silver.py` lee `s3://ipd-nayeli-s3/raw/deportistas.csv`, valida campos obligatorios, elimina duplicados por `id` y escribe Delta en `s3://ipd-nayeli-s3/silver/deportistas`. Registra `ipd_catalog.silver.deportistas` en Unity Catalog y comprueba el conteo persistido.
+
+La programación es diaria a las **07:00, America/Lima**. También se puede ejecutar manualmente desde Jobs & Pipelines. Los cambios de GitHub se incorporan en la próxima ejecución; no se utiliza un webhook por cada push.
+
+- [Workflow en Databricks](https://dbc-6d9a3ebe-2368.cloud.databricks.com/jobs/1010035654278929?o=7474649658925615)
+- Definición reproducible: `databricks/ipd_workflow.json`.
+- External Location: `ipd-nayeli-s3-n`, con la credencial IAM existente del workspace.
+- No se necesitan claves AWS en notebooks ni secretos de Databricks en GitHub.
+- Se verificó la fuente CSV. La lectura de Excel no forma parte de esta implementación.
+
+Los datos de muestra contienen 5 filas: 1 inválida, 1 duplicada y 3 deportistas válidos únicos. Son datos académicos, no indicadores oficiales del IPD.
+
+Para crear el workflow en este mismo workspace mediante una sesión autenticada de la CLI:
+
+```bash
+databricks jobs create --json @databricks/ipd_workflow.json --profile IPD_NAYELI
+```
+
+El job ya desplegado debe actualizarse en lugar de crear duplicados. Los identificadores y rutas del JSON corresponden al workspace de esta entrega; para otro workspace se deben adaptar.
+
+## Componentes de procesamiento
 
 - **Domain:** reglas de calidad del dato.
 - **Application:** procesamiento y preparación mediante Spark.
@@ -125,5 +150,5 @@ Incluye:
 - persistencia por capas RAW/Bronze, Silver y Gold;
 - reglas de calidad adicionales;
 - indicadores deportivos;
-- integración con almacenamiento cloud;
-- automatización completa del pipeline.
+- ampliar los formatos de entrada, incluido Excel;
+- extender el workflow a nuevas fuentes y capas.
