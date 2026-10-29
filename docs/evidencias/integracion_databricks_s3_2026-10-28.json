@@ -99,5 +99,68 @@
         "result": "PASS"
       }
     ]
+  },
+  "production_run": {
+    "run_id": 193316074646830,
+    "state": {
+      "life_cycle_state": "TERMINATED",
+      "result_state": "SUCCESS",
+      "state_message": "",
+      "user_cancelled_or_timedout": false
+    },
+    "url": "https://dbc-6d9a3ebe-2368.cloud.databricks.com/?o=7474649658925615#job/1010035654278929/run/193316074646830",
+    "tasks": [
+      {
+        "key": "s3_to_silver",
+        "run_id": 273948333593766,
+        "state": {
+          "life_cycle_state": "TERMINATED",
+          "result_state": "SUCCESS",
+          "state_message": "",
+          "user_cancelled_or_timedout": false
+        },
+        "output": {
+          "raw_path": "s3://ipd-nayeli-s3/raw/deportistas.csv",
+          "silver_path": "s3://ipd-nayeli-s3/silver/deportistas",
+          "table": "ipd_catalog.silver.deportistas",
+          "input_rows": 5,
+          "invalid_rows": 1,
+          "duplicate_rows": 1,
+          "silver_rows": 3
+        }
+      },
+      {
+        "key": "sync_git_folder",
+        "run_id": 99652710023786,
+        "state": {
+          "life_cycle_state": "TERMINATED",
+          "result_state": "SUCCESS",
+          "state_message": "",
+          "user_cancelled_or_timedout": false
+        },
+        "output": {
+          "repo_id": 152918773774445,
+          "branch": "main",
+          "previous_commit": "b2594999ff255aa1e1cc06baa0f3b1d9b18f6fa4",
+          "commit": "02a1df012f9c79f86d30a78e226f5eae02fedee4"
+        }
+      }
+    ]
+  },
+  "active_schedule": {
+    "pause_status": "UNPAUSED",
+    "quartz_cron_expression": "0 0 7 * * ?",
+    "timezone_id": "America/Lima"
+  },
+  "git_source": {
+    "git_branch": "main",
+    "git_provider": "gitHub",
+    "git_url": "https://github.com/NayeliRocio/07-NayeliHerrera-BigData-Spark.git"
+  },
+  "table_metadata": {
+    "full_name": "ipd_catalog.silver.deportistas",
+    "table_type": "EXTERNAL",
+    "data_source_format": "DELTA",
+    "storage_location": "s3://ipd-nayeli-s3/silver/deportistas"
   }
 }
