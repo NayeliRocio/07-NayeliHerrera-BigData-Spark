@@ -1,0 +1,62 @@
+{
+  "validation_date_lima": "2026-10-28",
+  "databricks_job_id": 1010035654278929,
+  "run_id": 621760454209521,
+  "run_url": "https://dbc-6d9a3ebe-2368.cloud.databricks.com/?o=7474649658925615#job/1010035654278929/run/621760454209521",
+  "job_result": "SUCCESS",
+  "tasks": [
+    {
+      "name": "s3_to_silver",
+      "run_id": 274662467020428,
+      "result": "SUCCESS"
+    },
+    {
+      "name": "silver_to_gold",
+      "run_id": 128246086478778,
+      "result": "SUCCESS"
+    },
+    {
+      "name": "sync_git_folder",
+      "run_id": 403204357742441,
+      "result": "SUCCESS"
+    }
+  ],
+  "gold_output": {
+    "gold_csv": "s3://ipd-nayeli-s3/gold/deportistas_por_disciplina_region.csv",
+    "gold_delta": "s3://ipd-nayeli-s3/gold/delta/deportistas_por_disciplina_region",
+    "gold_table": "ipd_catalog.gold.deportistas_por_disciplina_region",
+    "groups": 3,
+    "total_deportistas": 3,
+    "loaded_from_s3": true
+  },
+  "s3_csv_object": {
+    "path": "s3://ipd-nayeli-s3/gold/deportistas_por_disciplina_region.csv",
+    "size_bytes": 90
+  },
+  "gold_table": {
+    "name": "ipd_catalog.gold.deportistas_por_disciplina_region",
+    "type": "EXTERNAL",
+    "storage_location": "s3://ipd-nayeli-s3/gold/delta/deportistas_por_disciplina_region",
+    "verification_query": {
+      "groups": 3,
+      "athletes": 3,
+      "invalid_rows": 0
+    }
+  },
+  "github_actions": {
+    "run_id": 40804126608,
+    "run_url": "https://github.com/NayeliRocio/07-NayeliHerrera-BigData-Spark/actions/runs/40804126608",
+    "commit": "92f7e330c959f1e880f75e3f7297c71f2468abce",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "Validar proyecto",
+        "conclusion": "success"
+      },
+      {
+        "name": "Sincronizar y verificar Git Folder",
+        "conclusion": "success"
+      }
+    ]
+  }
+}
