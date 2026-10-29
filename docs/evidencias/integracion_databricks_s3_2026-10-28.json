@@ -1,0 +1,103 @@
+{
+  "validation_date_local": "2026-10-28",
+  "timezone": "America/Lima",
+  "workspace_host": "https://dbc-6d9a3ebe-2368.cloud.databricks.com",
+  "job_id": 1010035654278929,
+  "test_run_id": 216764337065602,
+  "test_state": "SUCCESS",
+  "sync_task_run_id": 285774984205839,
+  "etl_task_run_id": 1080661806591880,
+  "metrics": {
+    "raw_path": "s3://ipd-nayeli-s3/raw/deportistas.csv",
+    "silver_path": "s3://ipd-nayeli-s3/silver/deportistas",
+    "table": "ipd_catalog.silver.deportistas",
+    "input_rows": 5,
+    "invalid_rows": 1,
+    "duplicate_rows": 1,
+    "silver_rows": 3
+  },
+  "table_validation": {
+    "manifest": {
+      "chunks": [
+        {
+          "chunk_index": 0,
+          "row_count": 1,
+          "row_offset": 0
+        }
+      ],
+      "format": "JSON_ARRAY",
+      "schema": {
+        "column_count": 3,
+        "columns": [
+          {
+            "name": "rows",
+            "position": 0,
+            "type_name": "LONG",
+            "type_text": "BIGINT"
+          },
+          {
+            "name": "unique_ids",
+            "position": 1,
+            "type_name": "LONG",
+            "type_text": "BIGINT"
+          },
+          {
+            "name": "invalid_rows",
+            "position": 2,
+            "type_name": "LONG",
+            "type_text": "BIGINT"
+          }
+        ]
+      },
+      "total_chunk_count": 1,
+      "total_row_count": 1,
+      "truncated": false
+    },
+    "result": {
+      "chunk_index": 0,
+      "data_array": [
+        [
+          "3",
+          "3",
+          "0"
+        ]
+      ],
+      "row_count": 1,
+      "row_offset": 0
+    },
+    "statement_id": "01f1d339-0995-194b-85d1-f0b94186e007",
+    "status": {
+      "state": "SUCCEEDED"
+    }
+  },
+  "s3_validation": {
+    "isDir": true,
+    "results": [
+      {
+        "operation": "READ",
+        "result": "PASS"
+      },
+      {
+        "operation": "LIST",
+        "result": "PASS"
+      },
+      {
+        "operation": "PATH_EXISTS",
+        "result": "PASS"
+      },
+      {
+        "message": "Provisioning has completed successfully. ",
+        "result": "PASS"
+      },
+      {
+        "result": "PASS"
+      },
+      {
+        "result": "PASS"
+      },
+      {
+        "result": "PASS"
+      }
+    ]
+  }
+}
