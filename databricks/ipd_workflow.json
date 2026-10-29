@@ -46,7 +46,10 @@
     },
     {
       "task_key": "s3_to_silver",
-      "depends_on": [{"task_key": "copy_source_to_s3"}],
+      "depends_on": [
+        {"task_key": "sync_git_folder"},
+        {"task_key": "copy_source_to_s3"}
+      ],
       "notebook_task": {
         "notebook_path": "/Workspace/Users/nayeli.herrera@vallegrande.edu.pe/07-NayeliHerrera-BigData-Spark/notebooks/01_s3_to_silver",
         "source": "WORKSPACE",

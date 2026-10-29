@@ -46,6 +46,7 @@ El Job **IPD - GitHub sync y S3 a Silver-Gold** procesa el dataset de eventos in
 - Gold: `s3://ipd-nayeli-s3/gold/participaciones_por_federacion_pais.csv` → `ipd_catalog.gold.participaciones_por_federacion_pais`.
 - Gold agrupa participaciones por federación y país del evento; `ITEM` es el identificador único. El total mide registros de participación, no personas únicas.
 - El CSV no se incluye en GitHub; queda en un volumen privado de Unity Catalog y el Job lo copia al bucket mediante la identidad IAM existente.
+- Ejecución verificada: 55,027 filas en Silver, 1,084 grupos Gold y 55,027 participaciones leídas nuevamente desde S3. Evidencia: `docs/evidencias/dataset_real_s3_2026-10-28.json`.
 
 GitHub Actions valida y sincroniza el Git Folder en cada **push a `main`**. El Job de Databricks está programado diariamente a las **07:00, America/Lima**, y puede ejecutarse también manualmente desde Jobs & Pipelines.
 

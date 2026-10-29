@@ -24,6 +24,8 @@ El Job corre diariamente a las 07:00, hora de Lima; también se puede iniciar ma
 
 El indicador Gold se llama `total_participaciones`: cuenta los registros con `ITEM` único en cada combinación de federación y país. No pretende contar personas únicas. `DEPARTAMENTO` del dataset solo tiene Lima, por eso el reporte utiliza `PAIS_EVENTO`.
 
+La corrida verificada conservó **55,027 registros Silver**, descartó **0 filas inválidas y 0 duplicados**, y produjo **1,084 grupos Gold** que suman **55,027 participaciones**. La tarea de carga confirmó en S3 que el objeto Raw tiene el mismo tamaño que el CSV fuente. Evidencia en `docs/evidencias/dataset_real_s3_2026-10-28.json`.
+
 ## Consultas
 
 ```sql

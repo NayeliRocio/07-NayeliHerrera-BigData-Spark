@@ -37,6 +37,6 @@ La cuenta Free Edition no tiene acceso a las API de cuenta necesarias para confi
 
 En [Actions](https://github.com/NayeliRocio/07-NayeliHerrera-BigData-Spark/actions/workflows/databricks-sync.yml), abrir la ejecución de `main` y verificar que **Validar proyecto** y **Sincronizar y verificar Git Folder** estén en verde. Descargar el artefacto y comprobar `status: verified`, `branch: main` y `head_commit_id`.
 
-La ejecución inicial se comprobó con cinco filas de muestra. La validación del dataset real se registrará en una evidencia separada después de ejecutar el Job actualizado; no se mezcla con la evidencia de muestra `docs/evidencias/integracion_databricks_s3_2026-10-28.json`.
+La ejecución con el dataset real terminó correctamente: se copiaron 10,422,598 bytes a S3, se conservaron 55,027 filas Silver y se generaron 1,084 grupos Gold (55,027 participaciones). La evidencia está en `docs/evidencias/dataset_real_s3_2026-10-28.json`; la evidencia previa de cinco filas de muestra permanece separada en `docs/evidencias/integracion_databricks_s3_2026-10-28.json`.
 
 Documentación oficial: [GitHub Actions con Databricks](https://docs.databricks.com/aws/en/dev-tools/ci-cd/github), [secretos de Actions](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets) y [límites de Free Edition](https://docs.databricks.com/aws/en/getting-started/free-edition-limitations).
