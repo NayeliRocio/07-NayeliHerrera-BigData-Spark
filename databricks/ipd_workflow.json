@@ -26,14 +26,33 @@
       "min_retry_interval_millis": 30000
     },
     {
+      "task_key": "copy_source_to_s3",
+      "depends_on": [
+        {
+          "task_key": "sync_git_folder"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "notebooks/00_copy_source_to_s3",
+        "source": "GIT",
+        "base_parameters": {
+          "source_path": "/Volumes/ipd_catalog/default/source_uploads/deportistas_eventos_internacionales.csv",
+          "target_path": "s3://ipd-nayeli-s3/raw/deportistas_eventos_internacionales.csv"
+        }
+      },
+      "timeout_seconds": 600,
+      "max_retries": 1,
+      "min_retry_interval_millis": 30000
+    },
+    {
       "task_key": "s3_to_silver",
-      "depends_on": [{"task_key": "sync_git_folder"}],
+      "depends_on": [{"task_key": "copy_source_to_s3"}],
       "notebook_task": {
         "notebook_path": "/Workspace/Users/nayeli.herrera@vallegrande.edu.pe/07-NayeliHerrera-BigData-Spark/notebooks/01_s3_to_silver",
         "source": "WORKSPACE",
         "base_parameters": {
-          "raw_path": "s3://ipd-nayeli-s3/raw/deportistas.csv",
-          "silver_path": "s3://ipd-nayeli-s3/silver/deportistas"
+          "raw_path": "s3://ipd-nayeli-s3/raw/deportistas_eventos_internacionales.csv",
+          "silver_path": "s3://ipd-nayeli-s3/silver/eventos_internacionales"
         }
       },
       "timeout_seconds": 1200,

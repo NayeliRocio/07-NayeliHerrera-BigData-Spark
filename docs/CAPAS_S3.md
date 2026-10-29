@@ -1,45 +1,42 @@
-# Archivo Gold en S3 consumido desde el Git Folder
+# Dataset real de eventos internacionales en Databricks y S3
 
-La actividad requiere un archivo de datos del proyecto en S3 y código Python o SQL en Databricks que lo lea y cree una tabla. Se implementa con el bucket privado `ipd-nayeli-s3` y la External Location existente de Unity Catalog.
+El Job trabaja con el archivo `deportistas_eventos_internacionales.csv` aportado por la estudiante. El CSV tiene 55,027 registros y 17 columnas; `ITEM` identifica cada registro y el archivo se mantiene fuera del repositorio GitHub.
 
-| Capa | Ruta en S3 | Contenido | Tabla de Databricks |
+| Capa | Ruta S3 | Contenido | Tabla Databricks |
 | --- | --- | --- | --- |
-| Raw | `raw/deportistas.csv` | Archivo original, 5 filas de muestra | Se lee con Spark |
-| Silver | `silver/deportistas/` | Delta, 3 deportistas válidos sin duplicados | `ipd_catalog.silver.deportistas` |
-| Gold | `gold/deportistas_por_disciplina_region.csv` | CSV con indicadores del proyecto | Se consume desde el notebook Gold |
-| Gold | `gold/delta/deportistas_por_disciplina_region/` | Delta del archivo Gold consumido | `ipd_catalog.gold.deportistas_por_disciplina_region` |
+| Raw | `raw/deportistas_eventos_internacionales.csv` | CSV fuente de eventos internacionales | Lectura con Spark |
+| Silver | `silver/eventos_internacionales/` | Registros validados y deduplicados por `ITEM`, conservando los campos del archivo | `ipd_catalog.silver.eventos_internacionales` |
+| Gold | `gold/participaciones_por_federacion_pais.csv` | Conteo de participaciones por federación y país del evento | Lectura del CSV desde S3 |
+| Gold | `gold/delta/participaciones_por_federacion_pais/` | Delta del reporte Gold leído desde S3 | `ipd_catalog.gold.participaciones_por_federacion_pais` |
 
-S3 utiliza prefijos; `raw/`, `silver/` y `gold/` se muestran como carpetas en la consola.
+S3 presenta `raw/`, `silver/` y `gold/` como prefijos, equivalentes a carpetas.
 
-## Qué hace el archivo Python
+## Flujo automatizado
 
-`notebooks/02_silver_to_gold.py`, ubicado en el Git Folder:
+`databricks/ipd_workflow.json` define el Job programado y ejecuta estas tareas:
 
-1. Agrupa los deportistas de Silver por disciplina y región.
-2. Carga un único archivo CSV con encabezado a `s3://ipd-nayeli-s3/gold/deportistas_por_disciplina_region.csv`.
-3. Lee ese archivo desde S3 usando `spark.read.csv`.
-4. Verifica los conteos y guarda la tabla externa Delta Gold, registrada en Unity Catalog.
+1. Sincroniza el Git Folder con la rama `main`.
+2. Copia el CSV desde `/Volumes/ipd_catalog/default/source_uploads/` al prefijo Raw del bucket privado `ipd-nayeli-s3`.
+3. Lee el CSV con Spark, estandariza nombres de columnas, valida `ITEM`, federación, evento, país y deportista, deduplica por `ITEM`, y guarda Silver en Delta.
+4. Agrupa Silver por federación y país del evento, escribe un CSV Gold en S3, lo lee de nuevo desde S3 y crea la tabla externa Delta Gold.
 
-El archivo contiene las columnas `disciplina`, `region`, `total_deportistas`. Para los datos de muestra, el reporte tiene 3 grupos y suma 3 deportistas.
+El Job corre diariamente a las 07:00, hora de Lima; también se puede iniciar manualmente desde [Jobs & Pipelines](https://dbc-6d9a3ebe-2368.cloud.databricks.com/jobs/1010035654278929?o=7474649658925615). GitHub Actions sincroniza el Git Folder con cada push a `main`.
 
-El workflow ejecuta `sync_git_folder → s3_to_silver → silver_to_gold` cada día a las 07:00 de Lima. Se puede ejecutar manualmente en [Jobs & Pipelines](https://dbc-6d9a3ebe-2368.cloud.databricks.com/jobs/1010035654278929?o=7474649658925615). GitHub Actions actualiza el Git Folder en cada push a `main`.
+El indicador Gold se llama `total_participaciones`: cuenta los registros con `ITEM` único en cada combinación de federación y país. No pretende contar personas únicas. `DEPARTAMENTO` del dataset solo tiene Lima, por eso el reporte utiliza `PAIS_EVENTO`.
 
-## Consultar el archivo y la tabla
-
-El archivo `sql/03_gold_desde_s3.sql` contiene las consultas completas. Para revisar la tabla:
+## Consultas
 
 ```sql
-SELECT * FROM ipd_catalog.gold.deportistas_por_disciplina_region;
+SELECT * FROM ipd_catalog.gold.participaciones_por_federacion_pais
+ORDER BY federacion, pais_evento;
 ```
 
-Para comprobar el CSV directamente en el bucket:
+Para comprobar el CSV fuente directamente desde S3:
 
 ```sql
-SELECT * FROM read_files(
-  's3://ipd-nayeli-s3/gold/deportistas_por_disciplina_region.csv',
-  format => 'csv', header => true,
-  schema => 'disciplina STRING, region STRING, total_deportistas BIGINT'
+SELECT count(*) AS filas
+FROM read_files(
+  's3://ipd-nayeli-s3/raw/deportistas_eventos_internacionales.csv',
+  format => 'csv', header => true
 );
 ```
-
-Estas rutas pertenecen a la cuenta AWS cuyo acceso ya se verificó desde Databricks. El nombre de una capa describe el estado de los datos; la carga a S3 y la creación de una tabla son operaciones distintas y ambas están implementadas en el notebook. Los resultados son demostrativos.

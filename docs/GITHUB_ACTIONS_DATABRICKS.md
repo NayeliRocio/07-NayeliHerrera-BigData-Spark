@@ -17,9 +17,10 @@ El notebook de la referencia lee CSV con Spark mediante Unity Catalog y registra
 | Actualización del Git Folder | API Repos, equivalente al comando `databricks repos update` |
 | Verificación | Se comprueban repositorio, rama y SHA completo después de actualizar |
 | Evidencia | Artefacto `databricks-sync-<SHA>` en la ejecución de Actions |
-| Procesamiento S3 | Workflow Databricks diario a las 07:00, America/Lima |
-| Tabla de salida | Delta externa en `ipd_catalog.silver.deportistas` |
-| Archivo Gold consumido desde S3 | `gold/deportistas_por_disciplina_region.csv` → `ipd_catalog.gold.deportistas_por_disciplina_region` |
+| Procesamiento S3 | Job Databricks diario a las 07:00, America/Lima: copia fuente → Silver → Gold |
+| Fuente | CSV real de 55,027 registros, cargado fuera del repositorio en un volumen privado y copiado a `raw/` de S3 |
+| Tabla Silver | `ipd_catalog.silver.eventos_internacionales` |
+| Archivo Gold consumido desde S3 | `gold/participaciones_por_federacion_pais.csv` → `ipd_catalog.gold.participaciones_por_federacion_pais` |
 
 Los pasos de Actions están fijados a commits de sus repositorios oficiales. La sincronización falla si faltan credenciales, si el Git Folder pertenece a otro repositorio o si el commit final no coincide con el push. No descarta cambios locales por la fuerza.
 
@@ -36,6 +37,6 @@ La cuenta Free Edition no tiene acceso a las API de cuenta necesarias para confi
 
 En [Actions](https://github.com/NayeliRocio/07-NayeliHerrera-BigData-Spark/actions/workflows/databricks-sync.yml), abrir la ejecución de `main` y verificar que **Validar proyecto** y **Sincronizar y verificar Git Folder** estén en verde. Descargar el artefacto y comprobar `status: verified`, `branch: main` y `head_commit_id`.
 
-La conexión S3 ya se comprobó con lectura real y escritura Delta: 5 filas de entrada, 1 inválida, 1 duplicada y 3 deportistas válidos. Las evidencias están en `docs/evidencias/integracion_databricks_s3_2026-10-28.json`.
+La ejecución inicial se comprobó con cinco filas de muestra. La validación del dataset real se registrará en una evidencia separada después de ejecutar el Job actualizado; no se mezcla con la evidencia de muestra `docs/evidencias/integracion_databricks_s3_2026-10-28.json`.
 
 Documentación oficial: [GitHub Actions con Databricks](https://docs.databricks.com/aws/en/dev-tools/ci-cd/github), [secretos de Actions](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets) y [límites de Free Edition](https://docs.databricks.com/aws/en/getting-started/free-edition-limitations).

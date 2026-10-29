@@ -39,23 +39,23 @@ Proyecto académico orientado a la integración y preparación de información d
 
 ## Integración Databricks y Amazon S3
 
-El workflow **IPD - GitHub sync y S3 a Silver-Gold** ejecuta tres tareas en orden:
+El Job **IPD - GitHub sync y S3 a Silver-Gold** procesa el dataset de eventos internacionales en cuatro tareas: sincroniza el Git Folder, copia el CSV privado desde el volumen de carga a S3 `raw/`, valida y transforma las 55,027 filas a Delta Silver, y genera y relee el CSV Gold desde S3 para crear una tabla Delta Gold.
 
-1. `notebooks/00_sync_git_folder.py` sincroniza la rama `main` de GitHub con el Git Folder del workspace. Utiliza la identidad de ejecución, sin tokens en el código, y falla si existen conflictos locales.
-2. `notebooks/01_s3_to_silver.py` lee `s3://ipd-nayeli-s3/raw/deportistas.csv`, valida campos obligatorios, elimina duplicados por `id` y escribe Delta en `s3://ipd-nayeli-s3/silver/deportistas`. Registra `ipd_catalog.silver.deportistas` en Unity Catalog y comprueba el conteo persistido.
-3. `notebooks/02_silver_to_gold.py` genera el archivo `s3://ipd-nayeli-s3/gold/deportistas_por_disciplina_region.csv`, vuelve a leer ese archivo desde S3 y crea la tabla externa Delta `ipd_catalog.gold.deportistas_por_disciplina_region` con indicadores por disciplina y región.
+- Entrada real: `s3://ipd-nayeli-s3/raw/deportistas_eventos_internacionales.csv`.
+- Silver: `s3://ipd-nayeli-s3/silver/eventos_internacionales` → `ipd_catalog.silver.eventos_internacionales`.
+- Gold: `s3://ipd-nayeli-s3/gold/participaciones_por_federacion_pais.csv` → `ipd_catalog.gold.participaciones_por_federacion_pais`.
+- Gold agrupa participaciones por federación y país del evento; `ITEM` es el identificador único. El total mide registros de participación, no personas únicas.
+- El CSV no se incluye en GitHub; queda en un volumen privado de Unity Catalog y el Job lo copia al bucket mediante la identidad IAM existente.
 
-GitHub Actions sincroniza y verifica el Git Folder con cada **push a `main`**. El procesamiento S3 está programado diariamente a las **07:00, America/Lima**, y también se puede ejecutar manualmente desde Jobs & Pipelines. La tarea inicial del job vuelve a sincronizar como respaldo antes de procesar los datos.
+GitHub Actions valida y sincroniza el Git Folder en cada **push a `main`**. El Job de Databricks está programado diariamente a las **07:00, America/Lima**, y puede ejecutarse también manualmente desde Jobs & Pipelines.
 
 - [Workflow en Databricks](https://dbc-6d9a3ebe-2368.cloud.databricks.com/jobs/1010035654278929?o=7474649658925615)
 - Definición reproducible: `databricks/ipd_workflow.json`.
 - External Location: `ipd-nayeli-s3-n`, con la credencial IAM existente del workspace.
 - No se incluyen claves AWS ni tokens en el código. GitHub Actions utiliza el secreto cifrado `DATABRICKS_TOKEN` y las variables `DATABRICKS_HOST` y `DATABRICKS_REPO_ID`.
-- Se verificó la fuente CSV. La lectura de Excel no forma parte de esta implementación.
+- La lectura validada es CSV; Excel no forma parte de esta ejecución.
 
-Los datos de muestra contienen 5 filas: 1 inválida, 1 duplicada y 3 deportistas válidos únicos. Son datos académicos, no indicadores oficiales del IPD.
-
-En el bucket quedan las tres capas: **raw/** con el CSV original, **silver/** con los deportistas limpios y **gold/** con el CSV del reporte y su tabla Delta. [Rutas y consultas de la entrega](docs/CAPAS_S3.md).
+Las capas y consultas están descritas en [docs/CAPAS_S3.md](docs/CAPAS_S3.md).
 
 El pipeline `.github/workflows/databricks-sync.yml` valida el proyecto antes de sincronizar y guarda un artefacto que acredita el commit aplicado. En los pull requests ejecuta únicamente las pruebas. [Configuración y comparación con la referencia](docs/GITHUB_ACTIONS_DATABRICKS.md).
 
