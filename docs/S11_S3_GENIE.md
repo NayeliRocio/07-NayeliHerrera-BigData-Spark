@@ -3,9 +3,9 @@
 ## Proyecto y rutas
 Se reutiliza `NayeliRocio/07-NayeliHerrera-BigData-Spark`, proyecto IPD. El CSV real del repositorio tiene las columnas `id`, `nombre`, `disciplina`, `region`.
 
-- Bucket: `s3://ipd-noestructurados-nayeli-20260928-7314`
-- Raw CSV: `s3://ipd-noestructurados-nayeli-20260928-7314/raw/deportistas.csv`
-- Silver Delta: `s3://ipd-noestructurados-nayeli-20260928-7314/silver/deportistas`
+- Bucket: `s3://ipd-nayeli-s3`
+- Raw CSV: `s3://ipd-nayeli-s3/raw/deportistas.csv`
+- Silver Delta: `s3://ipd-nayeli-s3/silver/deportistas`
 - Tabla: `ipd_catalog.silver.deportistas`
 
 La captura del bucket muestra la carpeta `raw/`. Sube allí el archivo `data/sample/deportistas.csv` con el nombre `deportistas.csv`. El notebook crea el prefijo Silver al escribir Delta.

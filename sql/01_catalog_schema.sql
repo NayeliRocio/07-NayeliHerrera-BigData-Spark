@@ -6,6 +6,6 @@ CREATE SCHEMA IF NOT EXISTS ipd_catalog.silver;
 -- Ejecutar después del notebook 01_s3_to_silver.py.
 CREATE TABLE IF NOT EXISTS ipd_catalog.silver.deportistas
 USING DELTA
-LOCATION 's3://ipd-noestructurados-nayeli-20260928-7314/silver/deportistas';
+LOCATION 's3://ipd-nayeli-s3/silver/deportistas';
 
 SELECT * FROM ipd_catalog.silver.deportistas LIMIT 10;
