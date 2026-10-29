@@ -1,4 +1,4 @@
-"""Sincroniza un Git Folder existente y comprueba su rama y commit.
+"""Sincroniza un Git Folder existente y comprueba su rama y commit- EVI.
 
 Usa DATABRICKS_TOKEN desde el entorno. No crea credenciales, carpetas ni jobs.
 """
