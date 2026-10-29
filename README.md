@@ -39,10 +39,11 @@ Proyecto académico orientado a la integración y preparación de información d
 
 ## Integración Databricks y Amazon S3
 
-El workflow **IPD - GitHub sync y S3 a Silver** ejecuta dos tareas en orden:
+El workflow **IPD - GitHub sync y S3 a Silver-Gold** ejecuta tres tareas en orden:
 
 1. `notebooks/00_sync_git_folder.py` sincroniza la rama `main` de GitHub con el Git Folder del workspace. Utiliza la identidad de ejecución, sin tokens en el código, y falla si existen conflictos locales.
 2. `notebooks/01_s3_to_silver.py` lee `s3://ipd-nayeli-s3/raw/deportistas.csv`, valida campos obligatorios, elimina duplicados por `id` y escribe Delta en `s3://ipd-nayeli-s3/silver/deportistas`. Registra `ipd_catalog.silver.deportistas` en Unity Catalog y comprueba el conteo persistido.
+3. `notebooks/02_silver_to_gold.py` genera el archivo `s3://ipd-nayeli-s3/gold/deportistas_por_disciplina_region.csv`, vuelve a leer ese archivo desde S3 y crea la tabla externa Delta `ipd_catalog.gold.deportistas_por_disciplina_region` con indicadores por disciplina y región.
 
 GitHub Actions sincroniza y verifica el Git Folder con cada **push a `main`**. El procesamiento S3 está programado diariamente a las **07:00, America/Lima**, y también se puede ejecutar manualmente desde Jobs & Pipelines. La tarea inicial del job vuelve a sincronizar como respaldo antes de procesar los datos.
 
@@ -53,6 +54,8 @@ GitHub Actions sincroniza y verifica el Git Folder con cada **push a `main`**. E
 - Se verificó la fuente CSV. La lectura de Excel no forma parte de esta implementación.
 
 Los datos de muestra contienen 5 filas: 1 inválida, 1 duplicada y 3 deportistas válidos únicos. Son datos académicos, no indicadores oficiales del IPD.
+
+En el bucket quedan las tres capas: **raw/** con el CSV original, **silver/** con los deportistas limpios y **gold/** con el CSV del reporte y su tabla Delta. [Rutas y consultas de la entrega](docs/CAPAS_S3.md).
 
 El pipeline `.github/workflows/databricks-sync.yml` valida el proyecto antes de sincronizar y guarda un artefacto que acredita el commit aplicado. En los pull requests ejecuta únicamente las pruebas. [Configuración y comparación con la referencia](docs/GITHUB_ACTIONS_DATABRICKS.md).
 
