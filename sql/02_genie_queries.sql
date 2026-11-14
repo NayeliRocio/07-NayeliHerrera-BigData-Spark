@@ -43,13 +43,18 @@ FROM ranking
 WHERE posicion <= 3
 ORDER BY federacion, posicion;
 
--- 5. Detalle filtrable por federación y país a partir de Silver.
--- Cambia los valores del filtro por una federación y país presentes en la tabla.
+-- 5. Filtro dinámico: detalle Silver de la federación con más participaciones.
+-- El valor se obtiene de Gold, así no depende de adivinar nombres o categorías.
 SELECT item_id, federacion, evento, pais_evento, ciudad_evento,
        deportista, puesto, especialidad, fecha_inicio
 FROM ipd_catalog.silver.eventos_internacionales
-WHERE federacion = 'Federación Peruana de Atletismo'
-  AND pais_evento = 'Perú'
+WHERE federacion = (
+  SELECT federacion
+  FROM ipd_catalog.gold.participaciones_por_federacion_pais
+  GROUP BY federacion
+  ORDER BY SUM(total_participaciones) DESC
+  LIMIT 1
+)
 ORDER BY fecha_inicio DESC, evento, deportista
 LIMIT 100;
 
