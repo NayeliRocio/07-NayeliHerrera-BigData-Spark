@@ -11,6 +11,7 @@ silver = spark.table(SILVER_TABLE)
 
 # Acepta formatos de fecha habituales sin detener el notebook por valores inválidos.
 parsed_date = F.expr("""coalesce(
+    try_to_timestamp(fecha_inicio, 'yyyyMMdd'),
     try_to_timestamp(fecha_inicio, 'yyyy-MM-dd'),
     try_to_timestamp(fecha_inicio, 'dd/MM/yyyy'),
     try_to_timestamp(fecha_inicio, 'yyyy/MM/dd'),
@@ -26,8 +27,10 @@ if year_bounds["ultimo_anio_observado"] is None:
     raise ValueError("Silver no contiene fechas de inicio reconocibles; no se pueden calcular tendencias anuales")
 
 latest_observed = int(year_bounds["ultimo_anio_observado"])
-target_year = latest_observed + 1
-training_years = list(range(latest_observed - 3, latest_observed))
+current_year = int(spark.sql("SELECT YEAR(CURRENT_DATE())").first()[0])
+last_complete_year = min(latest_observed, current_year - 1)
+target_year = max(latest_observed + 1, current_year + 1)
+training_years = list(range(last_complete_year - 2, last_complete_year + 1))
 
 if len(training_years) != 3 or min(training_years) < 1900:
     raise ValueError(f"Rango anual inválido para el entrenamiento: {training_years}")
@@ -57,10 +60,11 @@ def forecast_dimension(rows, dimension, label, min_active_years=2):
         ys = [by_year.get(year, 0) for year in training_years]
         if sum(value > 0 for value in ys) < min_active_years:
             continue
-        # Años x = 1, 2, 3; la proyección es el año x = 4.
+        # Años x = 1, 2, 3; extrapola hasta el año objetivo desde el último año de entrenamiento.
         mean_y = sum(ys) / 3.0
         slope = sum((x - 2.0) * (y - mean_y) for x, y in zip((1.0, 2.0, 3.0), ys)) / 2.0
-        projected = max(0, round(mean_y + slope * 2.0))
+        years_ahead = target_year - training_years[-1]
+        projected = max(0, round(mean_y + slope * (years_ahead + 1)))
         output.append((label, category, target_year, *ys, round(slope, 2), projected))
 
     return sorted(output, key=lambda item: (-item[-1], item[1]))[:10]
@@ -87,6 +91,7 @@ print({
     "ultimo_anio_observado_excluido": latest_observed,
     "anios_de_entrenamiento": training_years,
     "anio_objetivo": target_year,
+    "horizonte_desde_ultimo_anio_entrenado": target_year - training_years[-1],
     "fechas_sin_parsear": dated.filter(F.col("fecha_parseada").isNull()).count(),
     "metodo": "tendencia lineal OLS de 3 años; estimación truncada en cero",
 })
