@@ -6,6 +6,7 @@
 WITH parsed AS (
   SELECT item_id, federacion, pais_evento, evento,
          COALESCE(
+           TRY_TO_TIMESTAMP(fecha_inicio, 'yyyyMMdd'),
            TRY_TO_TIMESTAMP(fecha_inicio, 'yyyy-MM-dd'),
            TRY_TO_TIMESTAMP(fecha_inicio, 'dd/MM/yyyy'),
            TRY_TO_TIMESTAMP(fecha_inicio, 'yyyy/MM/dd'),
@@ -21,56 +22,60 @@ dated AS (
 bounds AS (
   SELECT MAX(anio) AS ultimo_anio_observado FROM dated
 ),
+parameters AS (
+  SELECT ultimo_anio_observado,
+         LEAST(ultimo_anio_observado, YEAR(CURRENT_DATE()) - 1) AS ultimo_anio_completo,
+         GREATEST(ultimo_anio_observado + 1, YEAR(CURRENT_DATE()) + 1) AS anio_proyectado
+  FROM bounds
+),
 training AS (
   SELECT d.*,
-         b.ultimo_anio_observado,
-         b.ultimo_anio_observado + 1 AS anio_proyectado
-  FROM dated d CROSS JOIN bounds b
-  WHERE d.anio BETWEEN b.ultimo_anio_observado - 3 AND b.ultimo_anio_observado - 1
+         p.anio_proyectado
+  FROM dated d CROSS JOIN parameters p
+  WHERE d.anio BETWEEN p.ultimo_anio_completo - 2 AND p.ultimo_anio_completo
 ),
 years AS (
-  SELECT explode(sequence(ultimo_anio_observado - 3,
-                          ultimo_anio_observado - 1)) AS anio
-  FROM bounds
+  SELECT explode(sequence(ultimo_anio_completo - 2, ultimo_anio_completo)) AS anio
+  FROM parameters
 ),
 dimensions AS (
   SELECT 'Federación' AS prediccion, 'federacion' AS dimension,
-         federacion AS categoria, anio, item_id
+         federacion AS categoria, anio, anio_proyectado, item_id
   FROM training WHERE federacion IS NOT NULL AND TRIM(federacion) <> ''
   UNION ALL
-  SELECT 'País anfitrión', 'pais_evento', pais_evento, anio, item_id
+  SELECT 'País anfitrión', 'pais_evento', pais_evento, anio, anio_proyectado, item_id
   FROM training WHERE pais_evento IS NOT NULL AND TRIM(pais_evento) <> ''
   UNION ALL
-  SELECT 'Evento', 'evento', evento, anio, item_id
+  SELECT 'Evento', 'evento', evento, anio, anio_proyectado, item_id
   FROM training WHERE evento IS NOT NULL AND TRIM(evento) <> ''
 ),
 categories AS (
-  SELECT DISTINCT prediccion, dimension, categoria FROM dimensions
+  SELECT DISTINCT prediccion, dimension, categoria, anio_proyectado FROM dimensions
 ),
 annual AS (
-  SELECT prediccion, dimension, categoria, anio,
+  SELECT prediccion, dimension, categoria, anio_proyectado, anio,
          COUNT(DISTINCT item_id) AS participaciones
   FROM dimensions
-  GROUP BY prediccion, dimension, categoria, anio
+  GROUP BY prediccion, dimension, categoria, anio_proyectado, anio
 ),
 grid AS (
-  SELECT c.prediccion, c.dimension, c.categoria, y.anio,
+  SELECT c.prediccion, c.dimension, c.categoria, c.anio_proyectado, y.anio,
          COALESCE(a.participaciones, 0) AS participaciones
   FROM categories c CROSS JOIN years y
   LEFT JOIN annual a
     ON a.prediccion = c.prediccion
    AND a.dimension = c.dimension
    AND a.categoria = c.categoria
+   AND a.anio_proyectado = c.anio_proyectado
    AND a.anio = y.anio
 ),
 regression AS (
-  SELECT prediccion, dimension, categoria,
+  SELECT prediccion, dimension, categoria, anio_proyectado,
          COUNT_IF(participaciones > 0) AS anios_con_actividad,
-         MAX(anio) + 2 AS anio_proyectado,
          REGR_SLOPE(participaciones, anio) AS variacion_anual_estimada,
          REGR_INTERCEPT(participaciones, anio) AS intercepto
   FROM grid
-  GROUP BY prediccion, dimension, categoria
+  GROUP BY prediccion, dimension, categoria, anio_proyectado
 ),
 forecast AS (
   SELECT prediccion, dimension, categoria, anio_proyectado,
