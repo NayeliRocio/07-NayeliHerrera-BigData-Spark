@@ -158,3 +158,12 @@ Incluye:
 - indicadores deportivos;
 - ampliar los formatos de entrada, incluido Excel;
 - extender el workflow a nuevas fuentes y capas.
+
+
+## S13 AP7 — Predicciones
+
+Tres proyecciones exploratorias desde Silver: participaciones por federación, país anfitrión y evento.
+
+- Notebook: [notebooks/03_predicciones_s13.py](notebooks/03_predicciones_s13.py)
+- SQL: [sql/04_predicciones_s13.sql](sql/04_predicciones_s13.sql)
+- Guía para presentar: [docs/S13_AP7_PREDICCIONES.md](docs/S13_AP7_PREDICCIONES.md)
